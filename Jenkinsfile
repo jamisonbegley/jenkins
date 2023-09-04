@@ -6,6 +6,7 @@ pipeline {
             steps {
                 // Use Maven to build the code
                 sh 'mvn clean package'
+                mkdir 'Pipeline'
             }
         }
         
@@ -21,15 +22,20 @@ pipeline {
 
         stage('Code Analysis') {
             steps {
-                // Integrate a code analysis tool (e.g., SonarQube)
-                sh 'sonar-scanner'
+                // Integrate SonarQube for code analysis
+                script {
+                    def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    withEnv(["PATH+SONAR_SCANNER=${scannerHome}/bin"]) {
+                        sh 'sonar-scanner'
+                    }
+                }
             }
         }
 
         stage('Security Scan') {
             steps {
-                // Perform a security scan (e.g., OWASP ZAP, Checkmarx)
-                sh 'security-scan-command'
+                // Perform a security scan with OWASP ZAP
+                sh 'owasp-zap-scanner-command'
             }
         }
 
@@ -62,7 +68,7 @@ pipeline {
                 subject: 'Pipeline Success',
                 body: 'The Jenkins pipeline completed successfully.',
                 attachmentsPattern: '**/*.log', // Attach log files
-                to: 'your-email@example.com'
+                to: 'jamo.begley@icloud.com'
             )
         }
         failure {
@@ -71,7 +77,7 @@ pipeline {
                 subject: 'Pipeline Failure',
                 body: 'The Jenkins pipeline failed. Please investigate.',
                 attachmentsPattern: '**/*.log', // Attach log files
-                to: 'your-email@example.com'
+                to: 'jamo.begley@icloud.com'
             )
         }
     }
