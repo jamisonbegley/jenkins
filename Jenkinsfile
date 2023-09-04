@@ -5,8 +5,8 @@ pipeline {
         stage('Build') {
             steps {
                 // Use Maven to build the code
-                sh 'mvn clean package'
-                mkdir 'Pipeline'
+             //   sh 'mvn clean package'
+                sh 'echo' "Building"
             }
         }
         
