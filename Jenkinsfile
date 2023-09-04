@@ -4,65 +4,75 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                // Execute build using Maven or your preferred build tool
-                sh 'mvn clean package' // Replace with your build command
+                // Use Maven to build the code
+                sh 'mvn clean package'
             }
         }
         
         stage('Unit and Integration Tests') {
             steps {
-                // Run unit tests
-                sh 'mvn test' // Replace with your unit test command
+                // Run unit tests (e.g., JUnit)
+                sh 'mvn test'
                 
-                // Run integration tests
-                sh './run_integration_tests.sh' // Replace with your integration test command
+                // Run integration tests (e.g., Selenium, JUnit)
+                sh 'mvn integration-test'
             }
         }
 
         stage('Code Analysis') {
             steps {
-                // Integrate and run your code analysis tool here
-                sh './run_code_analysis.sh' // Replace with your code analysis tool command
+                // Integrate a code analysis tool (e.g., SonarQube)
+                sh 'sonar-scanner'
             }
         }
 
         stage('Security Scan') {
             steps {
-                // Integrate and run your security scanning tool here
-                sh './run_security_scan.sh' // Replace with your security scanning tool command
+                // Perform a security scan (e.g., OWASP ZAP, Checkmarx)
+                sh 'security-scan-command'
             }
         }
 
         stage('Deploy to Staging') {
             steps {
-                // Deploy to your staging environment (e.g., AWS EC2)
-                sh './deploy_to_staging.sh' // Replace with your deployment script
+                // Deploy the application to a staging server (e.g., AWS EC2)
+                sh 'deploy-to-staging-command'
             }
         }
 
         stage('Integration Tests on Staging') {
             steps {
                 // Run integration tests on the staging environment
-                sh './run_integration_tests_staging.sh' // Replace with your staging integration test command
+                sh 'run-staging-integration-tests-command'
             }
         }
 
         stage('Deploy to Production') {
             steps {
-                // Deploy to your production environment (e.g., AWS EC2)
-                sh './deploy_to_production.sh' // Replace with your production deployment script
+                // Deploy the application to a production server (e.g., AWS EC2)
+                sh 'deploy-to-production-command'
             }
         }
     }
 
     post {
         success {
-            // Perform actions on successful deployment
-            echo 'Deployment to production was successful.'
+            // Send a success email notification with logs
+            emailext (
+                subject: 'Pipeline Success',
+                body: 'The Jenkins pipeline completed successfully.',
+                attachmentsPattern: '**/*.log', // Attach log files
+                to: 'your-email@example.com'
+            )
         }
         failure {
-            // Perform actions on deployment failure
-            echo 'Deployment to production failed.'
+            // Send a failure email notification with logs
+            emailext (
+                subject: 'Pipeline Failure',
+                body: 'The Jenkins pipeline failed. Please investigate.',
+                attachmentsPattern: '**/*.log', // Attach log files
+                to: 'your-email@example.com'
+            )
         }
     }
 }
